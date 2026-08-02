@@ -1,4 +1,5 @@
 ﻿using Business.Abstract;
+using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using System;
@@ -16,40 +17,43 @@ namespace Business.Concrete
             _productDal = productDal;
         }
 
-        public void Add(Product product)
+        public IResult Add(Product product)
         {
             // bussiness codes if you need
             _productDal.Add(product);
+            return new SuccessResult("Product Added Successfully");
         }
 
-        public void Delete(Product product)
+        public IResult Delete(Product product)
         {
             // bussiness codes if you need
             _productDal.Delete(product);
+            return new SuccessResult("Product Deleted Successfully");
         }
 
-        public Product GetById(int productID)
+        public IDataResult<Product> GetById(int productID)
         {
             // bussiness codes if you need
-            return _productDal.Get(p => p.ProductID == productID);
+            return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductID == productID));
         }
 
-        public List<Product> GetList()
+        public IDataResult<List<Product>> GetList()
         {
             // bussiness codes if you need
-            return _productDal.GetList().ToList();
+            return new SuccessDataResult<List<Product>>(_productDal.GetList().ToList());
         }
 
-        public List<Product> GetListByCategory(int categoryID)
+        public IDataResult<List<Product>> GetListByCategory(int categoryID)
         {
             // bussiness codes if you need
-            return _productDal.GetList(p => p.CategoryID == categoryID).ToList();
+            return new SuccessDataResult<List<Product>>(_productDal.GetList(p => p.CategoryID == categoryID).ToList());
         }
 
-        public void Update(Product product)
+        public IResult Update(Product product)
         {
             // bussiness codes if you need
             _productDal.Update(product);
+            return new SuccessResult("Product Modified Successfully");
         }
     }
 }
