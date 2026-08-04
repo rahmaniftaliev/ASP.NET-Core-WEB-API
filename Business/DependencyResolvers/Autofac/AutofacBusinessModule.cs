@@ -13,12 +13,13 @@ namespace Business.DependencyResolvers.Autofac
     {
         protected override void Load(ContainerBuilder builder)
         {
-            // builder.RegisterType<ProductManager>().As<IProductService>();
-            // builder.RegisterType<CategoryManager>().As<ICategoryService>();
             builder.RegisterType<ProductManager>().As<IProductService>();
             builder.RegisterType<CategoryManager>().As<ICategoryService>();
             builder.RegisterType<EfProductDal>().As<IProductDal>();
             builder.RegisterType<EfCategoryDal>().As<ICategoryDal>();
+            builder.RegisterType<UserManager>().As<IUserService>();
+            builder.RegisterType<EfUserDal>().As<IUserDal>();
+
         }
     }
 }

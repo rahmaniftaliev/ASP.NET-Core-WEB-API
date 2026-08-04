@@ -1,7 +1,7 @@
 ﻿using Core.DataAccess.Concrete;
+using Core.Entities.Concrete;
 using DataAccess.Abstract;
 using DataAccess.Concrete.EntityFranework.Contexts;
-using Entities.Concrete;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,5 +21,6 @@ namespace DataAccess.Concrete.EntityFranework
                              select new OperationClaim { Id = operationClaim.Id, Name = operationClaim.Name };
                 return result.ToList();
             }
+        }
     }
 }
