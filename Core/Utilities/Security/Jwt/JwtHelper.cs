@@ -1,8 +1,11 @@
 ﻿using Core.Entities.Concrete;
 using Core.Utilities.Security.Encryption;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 namespace Core.Utilities.Security.Jwt
@@ -13,14 +16,37 @@ namespace Core.Utilities.Security.Jwt
 
         private TokenOptions _tokenOptions;
 
+        private DateTime _accessTokenExpiration;
+
+
         public JwtHelper(IConfiguration configuration)
         {
             Configuration = configuration;
             _tokenOptions = Configuration.GetSection("TokenOptions").Get<TokenOptions>();
+            _accessTokenExpiration = DateTime.Now.AddMinutes(_tokenOptions.AccessTokenExpiration);
         }
         public AccessToken CreateToken(User user, List<OperationClaim> operationClaims)
         {
-           var securityKey = SecurityKeyHelper.CreateSecurityKey(_tokenOptions.SecurityKey);
+            var securityKey = SecurityKeyHelper.CreateSecurityKey(_tokenOptions.SecurityKey);
+            var signingCredentials = SigningCredentialsHelpers.CreateSigningCredentials(securityKey);
+        }
+
+        public JwtSecurityToken CreateJwtSecurityToken(TokenOptions tokenOptions, User user, SigningCredentials signingCredentials, List<OperationClaim> operationClaims)
+        {
+            var jwt = new JwtSecurityToken(
+                    issuer: tokenOptions.Issuer,
+                    audience: tokenOptions.Audience,
+                    expires: _accessTokenExpiration,
+                    notBefore: DateTime.Now,
+                    claims: operationClaims,
+                    signingCredentials: signingCredentials
+                )
+        }
+
+        private IEnumerable<Claim> SetClaims(User user, List<OperationClaim> operationClaims)
+        {
+            var claims = new List<Claim>();
+
         }
     }
 }
