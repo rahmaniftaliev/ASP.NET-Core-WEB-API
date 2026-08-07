@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Entities.Concrete;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,6 +12,7 @@ namespace Business.Constants
         public static string ProductModified = "Product Modified Successfully";
         public static string ProductListed = "Products Listed Successfully";
         public static string UserNotFound = "User Not Found";
-
+        public static string PasswordError = "Password Is Error";
+        public static string SuccessfulLogin = "Successfull Login";
     }
 }
