@@ -1,10 +1,13 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Business.DependencyResolvers.Autofac;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+// Autofac
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
@@ -12,17 +15,50 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     containerBuilder.RegisterModule(new AutofacBusinessModule());
 });
 
-
-
-// Add services to the container.
-
+// Controllers
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowOrigin", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+// JWT Authentication
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = builder.Configuration["TokenOptions:Issuer"],
+            ValidAudience = builder.Configuration["TokenOptions:Audience"],
+
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(
+                    builder.Configuration["TokenOptions:SecurityKey"]!
+                )
+            )
+        };
+    });
+
+// OpenAPI
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Development
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -30,6 +66,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// CORS
+app.UseCors("AllowOrigin");
+
+// Authentication → Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
